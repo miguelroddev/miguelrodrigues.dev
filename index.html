@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Miguel Rodrigues</title>
+  <meta name="description" content="Projects by Miguel Rodrigues: Flight Companion and Outrora.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👋</text></svg>">
+  <style>
+    :root {
+      --bg: #f6f5f2;
+      --card: #ffffff;
+      --text: #1b1c1f;
+      --muted: #6b6f76;
+      --border: #e3e1dc;
+      --accent: #2f6fde;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #0f1115;
+        --card: #161920;
+        --text: #e8e8e8;
+        --muted: #9aa0a6;
+        --border: #262a33;
+        --accent: #6ea8fe;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 16px;
+      background: var(--bg);
+      color: var(--text);
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      line-height: 1.5;
+    }
+    main { width: 100%; max-width: 680px; }
+    h1 { font-size: clamp(1.8rem, 5vw, 2.4rem); margin: 0 0 .25rem; letter-spacing: -.02em; }
+    .intro { color: var(--muted); margin: 0 0 2.5rem; }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+    .card {
+      display: flex;
+      flex-direction: column;
+      gap: .5rem;
+      padding: 24px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      color: inherit;
+      text-decoration: none;
+      transition: border-color .2s, transform .2s;
+    }
+    .card:hover, .card:focus-visible { border-color: var(--accent); transform: translateY(-2px); outline: none; }
+    .emoji { font-size: 1.8rem; }
+    .card h2 { margin: 0; font-size: 1.2rem; }
+    .card p { margin: 0; color: var(--muted); font-size: .95rem; }
+    .link { margin-top: auto; padding-top: .5rem; color: var(--accent); font-size: .9rem; font-weight: 500; }
+    footer { margin-top: 3rem; color: var(--muted); font-size: .85rem; }
+    footer a { color: inherit; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Miguel Rodrigues</h1>
+    <p class="intro">Things I've built. Pick one.</p>
+
+    <div class="grid">
+      <a class="card" href="https://flightcompanion.miguelrodrigues.dev/">
+        <span class="emoji">✈️</span>
+        <h2>Flight Companion</h2>
+        <p>Your companion for every flight.</p>
+        <span class="link">flightcompanion.miguelrodrigues.dev →</span>
+      </a>
+
+      <a class="card" href="https://outrora.miguelrodrigues.dev/">
+        <span class="emoji">🏛️</span>
+        <h2>Outrora</h2>
+        <p>Guess the year and place of key moments in Portuguese history.</p>
+        <span class="link">outrora.miguelrodrigues.dev →</span>
+      </a>
+    </div>
+
+    <footer>
+      © <span id="year">2026</span> Miguel Rodrigues · <a href="https://github.com/miguelroddev">GitHub</a>
+    </footer>
+  </main>
+  <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+</body>
+</html>
