@@ -5,93 +5,314 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Miguel Rodrigues</title>
   <meta name="description" content="Projects by Miguel Rodrigues: Flight Companion and Outrora.">
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👋</text></svg>">
+  <meta name="theme-color" content="#07090d">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌍</text></svg>">
   <style>
     :root {
-      --bg: #f6f5f2;
-      --card: #ffffff;
-      --text: #1b1c1f;
-      --muted: #6b6f76;
-      --border: #e3e1dc;
-      --accent: #2f6fde;
-    }
-    @media (prefers-color-scheme: dark) {
-      :root {
-        --bg: #0f1115;
-        --card: #161920;
-        --text: #e8e8e8;
-        --muted: #9aa0a6;
-        --border: #262a33;
-        --accent: #6ea8fe;
-      }
+      --bg: #07090d;
+      --text: #eef1f5;
+      --muted: #9aa3ae;
+      --card: rgba(18, 22, 30, .62);
+      --border: rgba(255, 255, 255, .09);
+      --accent: #6ea8fe;
+      --accent-2: #f2b766;
     }
     * { box-sizing: border-box; }
+    html, body { margin: 0; height: 100%; }
     body {
-      margin: 0;
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 32px 16px;
-      background: var(--bg);
+      background:
+        radial-gradient(ellipse 80% 60% at 75% 40%, rgba(110,168,254,.10), transparent 70%),
+        var(--bg);
       color: var(--text);
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
       line-height: 1.5;
+      overflow-x: hidden;
     }
-    main { width: 100%; max-width: 680px; }
-    h1 { font-size: clamp(1.8rem, 5vw, 2.4rem); margin: 0 0 .25rem; letter-spacing: -.02em; }
-    .intro { color: var(--muted); margin: 0 0 2.5rem; }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 16px;
+
+    /* 3D globe sits behind everything and never blocks clicks */
+    #globe {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 1.2s ease;
     }
-    .card {
+    #globe.ready { opacity: 1; }
+
+    main {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 48px 24px;
       display: flex;
       flex-direction: column;
-      gap: .5rem;
-      padding: 24px;
+      justify-content: center;
+    }
+    .content { max-width: 520px; }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      font-size: .8rem;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 1rem;
+    }
+    .eyebrow::before {
+      content: "";
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      background: var(--accent-2);
+      box-shadow: 0 0 12px var(--accent-2);
+    }
+    h1 {
+      font-size: clamp(2.4rem, 7vw, 4rem);
+      line-height: 1.05;
+      letter-spacing: -.03em;
+      margin: 0 0 1rem;
+    }
+    .intro { color: var(--muted); font-size: 1.05rem; margin: 0 0 2.5rem; }
+
+    .cards { display: grid; gap: 14px; }
+    .card {
+      display: flex;
+      align-items: center;
+      gap: 18px;
+      padding: 20px 22px;
       background: var(--card);
       border: 1px solid var(--border);
-      border-radius: 16px;
+      border-radius: 18px;
       color: inherit;
       text-decoration: none;
-      transition: border-color .2s, transform .2s;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      transition: border-color .2s, transform .2s, background .2s;
     }
-    .card:hover, .card:focus-visible { border-color: var(--accent); transform: translateY(-2px); outline: none; }
-    .emoji { font-size: 1.8rem; }
-    .card h2 { margin: 0; font-size: 1.2rem; }
-    .card p { margin: 0; color: var(--muted); font-size: .95rem; }
-    .link { margin-top: auto; padding-top: .5rem; color: var(--accent); font-size: .9rem; font-weight: 500; }
-    footer { margin-top: 3rem; color: var(--muted); font-size: .85rem; }
+    .card:hover, .card:focus-visible {
+      border-color: var(--accent);
+      background: rgba(24, 30, 42, .75);
+      transform: translateY(-2px);
+      outline: none;
+    }
+    .icon {
+      flex: none;
+      width: 52px; height: 52px;
+      display: grid; place-items: center;
+      font-size: 1.6rem;
+      border-radius: 14px;
+      background: rgba(255,255,255,.05);
+      border: 1px solid var(--border);
+    }
+    .card-body { flex: 1; min-width: 0; }
+    .card h2 { margin: 0 0 2px; font-size: 1.15rem; }
+    .card p { margin: 0; color: var(--muted); font-size: .93rem; }
+    .arrow {
+      flex: none;
+      font-size: 1.3rem;
+      color: var(--muted);
+      transition: transform .2s, color .2s;
+    }
+    .card:hover .arrow, .card:focus-visible .arrow { transform: translateX(4px); color: var(--accent); }
+
+    footer {
+      margin-top: 3rem;
+      color: var(--muted);
+      font-size: .85rem;
+    }
     footer a { color: inherit; }
+    footer a:hover { color: var(--text); }
+
+    /* On phones the globe sits behind the text, so dim it a bit more */
+    @media (max-width: 760px) {
+      main { justify-content: flex-end; padding-bottom: 40px; }
+      #globe.ready { opacity: .45; }
+    }
   </style>
 </head>
 <body>
+  <canvas id="globe" aria-hidden="true"></canvas>
+
   <main>
-    <h1>Miguel Rodrigues</h1>
-    <p class="intro">Things I've built. Pick one.</p>
+    <div class="content">
+      <div class="eyebrow">Lisbon, Portugal</div>
+      <h1>Miguel Rodrigues</h1>
+      <p class="intro">Things I've built. Pick one.</p>
 
-    <div class="grid">
-      <a class="card" href="https://flightcompanion.miguelrodrigues.dev/">
-        <span class="emoji">✈️</span>
-        <h2>Flight Companion</h2>
-        <p>Your companion for every flight.</p>
-        <span class="link">flightcompanion.miguelrodrigues.dev →</span>
-      </a>
+      <nav class="cards" aria-label="Projects">
+        <a class="card" href="https://flightcompanion.miguelrodrigues.dev/">
+          <span class="icon" aria-hidden="true">✈️</span>
+          <span class="card-body">
+            <h2>Flight Companion</h2>
+            <p>Your companion for every flight.</p>
+          </span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
 
-      <a class="card" href="https://outrora.miguelrodrigues.dev/">
-        <span class="emoji">🏛️</span>
-        <h2>Outrora</h2>
-        <p>Guess the year and place of key moments in Portuguese history.</p>
-        <span class="link">outrora.miguelrodrigues.dev →</span>
-      </a>
+        <a class="card" href="https://outrora.miguelrodrigues.dev/">
+          <span class="icon" aria-hidden="true">🏛️</span>
+          <span class="card-body">
+            <h2>Outrora</h2>
+            <p>Guess the year and place of key moments in Portuguese history.</p>
+          </span>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+      </nav>
+
+      <footer>
+        © <span id="year">2026</span> Miguel Rodrigues · <a href="https://github.com/miguelroddev">GitHub</a>
+      </footer>
     </div>
-
-    <footer>
-      © <span id="year">2026</span> Miguel Rodrigues · <a href="https://github.com/miguelroddev">GitHub</a>
-    </footer>
   </main>
+
   <script>document.getElementById('year').textContent = new Date().getFullYear();</script>
+
+  <!-- Decorative globe. If this fails to load, the page still works exactly the same. -->
+  <script type="module">
+    import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+
+    const canvas = document.getElementById('globe');
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+    const scene = new THREE.Scene();
+    const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 100);
+    camera.position.set(0, 0, 5);
+
+    const globe = new THREE.Group();
+    scene.add(globe);
+
+    // Lat/lon (degrees) -> point on a unit sphere
+    function toVec(lat, lon, r = 1) {
+      const phi = (90 - lat) * Math.PI / 180;
+      const theta = (lon + 180) * Math.PI / 180;
+      return new THREE.Vector3(
+        -r * Math.sin(phi) * Math.cos(theta),
+         r * Math.cos(phi),
+         r * Math.sin(phi) * Math.sin(theta)
+      );
+    }
+
+    // Dotted sphere (evenly spread points)
+    const N = 2200;
+    const dots = new Float32Array(N * 3);
+    const golden = Math.PI * (3 - Math.sqrt(5));
+    for (let i = 0; i < N; i++) {
+      const y = 1 - (i / (N - 1)) * 2;
+      const r = Math.sqrt(1 - y * y);
+      const t = golden * i;
+      dots.set([Math.cos(t) * r, y, Math.sin(t) * r], i * 3);
+    }
+    const dotGeo = new THREE.BufferGeometry();
+    dotGeo.setAttribute('position', new THREE.BufferAttribute(dots, 3));
+    globe.add(new THREE.Points(dotGeo, new THREE.PointsMaterial({
+      color: 0x6ea8fe, size: 0.014, transparent: true, opacity: 0.55, depthWrite: false
+    })));
+
+    // Faint solid core so dots on the back side are dimmed
+    globe.add(new THREE.Mesh(
+      new THREE.SphereGeometry(0.985, 48, 48),
+      new THREE.MeshBasicMaterial({ color: 0x07090d, transparent: true, opacity: 0.8 })
+    ));
+
+    // Lisbon marker
+    const lisbon = toVec(38.72, -9.14);
+    const marker = new THREE.Mesh(
+      new THREE.SphereGeometry(0.022, 16, 16),
+      new THREE.MeshBasicMaterial({ color: 0xf2b766 })
+    );
+    marker.position.copy(lisbon);
+    globe.add(marker);
+
+    // Routes from Lisbon (flights + Portuguese voyages)
+    const destinations = [
+      [-22.9, -43.2],  // Rio de Janeiro
+      [40.7, -74.0],   // New York
+      [15.5, 73.8],    // Goa
+      [22.2, 113.5],   // Macau
+      [-33.9, 18.4],   // Cape Town
+      [51.5, -0.1],    // London
+    ];
+    const SEG = 80;
+    const arcs = destinations.map(([lat, lon], i) => {
+      const end = toVec(lat, lon);
+      const lift = 0.08 + lisbon.angleTo(end) * 0.18;
+      const pts = [];
+      for (let s = 0; s <= SEG; s++) {
+        const t = s / SEG;
+        pts.push(lisbon.clone().lerp(end, t).normalize().multiplyScalar(1 + lift * Math.sin(Math.PI * t)));
+      }
+      const geo = new THREE.BufferGeometry().setFromPoints(pts);
+      const line = new THREE.Line(geo, new THREE.LineBasicMaterial({
+        color: i % 2 ? 0x6ea8fe : 0xf2b766, transparent: true, opacity: 0.9
+      }));
+      globe.add(line);
+
+      const endDot = new THREE.Mesh(
+        new THREE.SphereGeometry(0.012, 8, 8),
+        new THREE.MeshBasicMaterial({ color: 0xeef1f5 })
+      );
+      endDot.position.copy(end);
+      globe.add(endDot);
+
+      return { geo, offset: i / destinations.length };
+    });
+
+    globe.rotation.x = 0.35;
+    // Start facing Europe
+    globe.rotation.y = -Math.PI / 2 + 9.14 * Math.PI / 180 - 0.5;
+
+    // Layout: globe on the right on wide screens, centered on phones
+    function resize() {
+      const w = window.innerWidth, h = window.innerHeight;
+      renderer.setSize(w, h, false);
+      camera.aspect = w / h;
+      camera.updateProjectionMatrix();
+      const wide = w > 760;
+      globe.position.set(wide ? 1.35 : 0, wide ? 0 : 0.75, 0);
+      globe.scale.setScalar(wide ? 1.25 : 1.05);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    // Gentle parallax with the mouse
+    let mx = 0, my = 0;
+    window.addEventListener('pointermove', e => {
+      mx = (e.clientX / window.innerWidth - 0.5);
+      my = (e.clientY / window.innerHeight - 0.5);
+    });
+
+    const clock = new THREE.Clock();
+    function frame() {
+      const t = clock.getElapsedTime();
+      globe.rotation.y += 0.0012;
+      camera.position.x += (mx * 0.3 - camera.position.x) * 0.04;
+      camera.position.y += (-my * 0.3 - camera.position.y) * 0.04;
+      camera.lookAt(0, 0, 0);
+
+      // Each route draws itself, then fades out, on a loop
+      for (const a of arcs) {
+        const p = ((t * 0.22 + a.offset) % 1.5);
+        const head = Math.min(p, 1) * SEG;
+        const tail = Math.max(0, Math.min(p - 0.5, 1)) * SEG;
+        a.geo.setDrawRange(Math.floor(tail), Math.max(0, Math.ceil(head - tail)) + 1);
+      }
+      marker.scale.setScalar(1 + 0.35 * Math.sin(t * 3));
+
+      renderer.render(scene, camera);
+      if (!reduceMotion) requestAnimationFrame(frame);
+    }
+    if (reduceMotion) arcs.forEach(a => a.geo.setDrawRange(0, SEG + 1));
+    frame();
+    canvas.classList.add('ready');
+  </script>
 </body>
 </html>
