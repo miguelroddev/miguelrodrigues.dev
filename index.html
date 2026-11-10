@@ -112,6 +112,18 @@
     }
     .card-body { flex: 1; min-width: 0; }
     .card h2 { margin: 0 0 2px; font-size: 1.15rem; }
+    .card h2:has(.badge) { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; }
+    .badge {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: .7rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+      vertical-align: middle;
+      color: #1b1406;
+      background: var(--accent-2);
+    }
     .card p { margin: 0; color: var(--muted); font-size: .93rem; }
     .arrow {
       flex: none;
@@ -148,19 +160,28 @@
       <nav class="cards" aria-label="Projects">
         <a class="card" href="https://flightcompanion.miguelrodrigues.dev/">
           <span class="icon" aria-hidden="true">✈️</span>
-          <span class="card-body">
+          <div class="card-body">
             <h2>Flight Companion</h2>
             <p>Your companion for every flight.</p>
-          </span>
+          </div>
           <span class="arrow" aria-hidden="true">→</span>
         </a>
 
         <a class="card" href="https://outrora.miguelrodrigues.dev/">
           <span class="icon" aria-hidden="true">🏛️</span>
-          <span class="card-body">
+          <div class="card-body">
             <h2>Outrora</h2>
             <p>Guess the year and place of key moments in Portuguese history.</p>
-          </span>
+          </div>
+          <span class="arrow" aria-hidden="true">→</span>
+        </a>
+
+        <a class="card" href="https://quantumtrace-three.vercel.app/">
+          <span class="icon" aria-hidden="true">🔐</span>
+          <div class="card-body">
+            <h2>QuantumTrace <span class="badge">🏆 JunctionX Lisbon winner</span></h2>
+            <p>Finds vulnerabilities a quantum computer could exploit.</p>
+          </div>
           <span class="arrow" aria-hidden="true">→</span>
         </a>
       </nav>
